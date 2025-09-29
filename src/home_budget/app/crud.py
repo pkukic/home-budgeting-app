@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
-from typing import Optional, List
+from sqlalchemy import func, and_
+from typing import Optional, List, Dict, Any
+from datetime import datetime, timedelta
 from home_budget.app.models import Category, User, Expense
 from home_budget.app.schemas import CategoryCreate, UserCreate, ExpenseCreate
 
@@ -113,3 +115,155 @@ class ExpenseCRUD:
             db.commit()
             return True
         return False
+
+
+class AnalyticsCRUD:
+    @staticmethod
+    def get_date_range_start(period: str) -> Optional[datetime]:
+        """Get the start date for the specified time period"""
+        now = datetime.now()
+        
+        if period == "week":
+            return now - timedelta(days=7)
+        elif period == "month":
+            return now - timedelta(days=30)
+        elif period == "quarter":
+            return now - timedelta(days=90)
+        elif period == "year":
+            return now - timedelta(days=365)
+        else:  # all_time
+            return None
+    
+    @staticmethod
+    def get_total_spending(db: Session, user_id: int, start_date: Optional[datetime] = None) -> Dict[str, Any]:
+        """Get total spending for a user with optional date filter"""
+        # Base query for total spending
+        query = db.query(func.sum(Expense.amount)).filter(Expense.owner_id == user_id)
+        if start_date:
+            query = query.filter(Expense.date >= start_date)
+        
+        total_spent = query.scalar() or 0.0
+        
+        # Get expense count
+        count_query = db.query(func.count(Expense.id)).filter(Expense.owner_id == user_id)
+        if start_date:
+            count_query = count_query.filter(Expense.date >= start_date)
+        
+        expense_count = count_query.scalar() or 0
+        avg_per_expense = total_spent / expense_count if expense_count > 0 else 0.0
+        
+        return {
+            "total_spent": round(total_spent, 2),
+            "expense_count": expense_count,
+            "average_per_expense": round(avg_per_expense, 2)
+        }
+    
+    @staticmethod
+    def get_spending_by_category(db: Session, user_id: int, start_date: Optional[datetime] = None) -> List[Dict[str, Any]]:
+        """Get spending breakdown by category"""
+        query = db.query(
+            Category.name,
+            Category.id,
+            func.sum(Expense.amount).label('total_spent'),
+            func.count(Expense.id).label('expense_count'),
+            func.avg(Expense.amount).label('average_amount')
+        ).join(
+            Expense, Category.id == Expense.category_id
+        ).filter(
+            Expense.owner_id == user_id
+        ).group_by(Category.id, Category.name)
+        
+        if start_date:
+            query = query.filter(Expense.date >= start_date)
+        
+        results = query.all()
+        
+        # Calculate total for percentage calculation
+        total_spent = sum(result.total_spent for result in results)
+        
+        category_breakdown = []
+        for result in results:
+            percentage = (result.total_spent / total_spent * 100) if total_spent > 0 else 0
+            category_breakdown.append({
+                "category_id": result.id,
+                "category_name": result.name,
+                "total_spent": round(result.total_spent, 2),
+                "expense_count": result.expense_count,
+                "average_amount": round(result.average_amount, 2),
+                "percentage_of_total": round(percentage, 2)
+            })
+        
+        # Sort by total spent (descending)
+        category_breakdown.sort(key=lambda x: x["total_spent"], reverse=True)
+        
+        return category_breakdown
+    
+    @staticmethod
+    def get_daily_spending(db: Session, user_id: int, days: int) -> List[Dict[str, Any]]:
+        """Get daily spending breakdown for the last N days"""
+        start_date = datetime.now() - timedelta(days=days)
+        
+        daily_data = db.query(
+            func.date(Expense.date).label('expense_date'),
+            func.sum(Expense.amount).label('daily_total'),
+            func.count(Expense.id).label('daily_count')
+        ).filter(
+            and_(
+                Expense.owner_id == user_id,
+                Expense.date >= start_date
+            )
+        ).group_by(
+            func.date(Expense.date)
+        ).order_by(
+            func.date(Expense.date)
+        ).all()
+        
+        daily_breakdown = []
+        for row in daily_data:
+            daily_breakdown.append({
+                "date": row.expense_date.isoformat(),
+                "total_spent": round(row.daily_total, 2),
+                "expense_count": row.daily_count
+            })
+        
+        return daily_breakdown
+    
+    @staticmethod
+    def get_period_comparison(db: Session, user_id: int, period_days: int) -> Dict[str, Any]:
+        """Compare spending between current and previous period"""
+        now = datetime.now()
+        
+        # Current period
+        current_start = now - timedelta(days=period_days)
+        current_spending = db.query(func.sum(Expense.amount)).filter(
+            and_(
+                Expense.owner_id == user_id,
+                Expense.date >= current_start
+            )
+        ).scalar() or 0.0
+        
+        # Previous period
+        previous_start = now - timedelta(days=period_days * 2)
+        previous_end = now - timedelta(days=period_days)
+        previous_spending = db.query(func.sum(Expense.amount)).filter(
+            and_(
+                Expense.owner_id == user_id,
+                Expense.date >= previous_start,
+                Expense.date < previous_end
+            )
+        ).scalar() or 0.0
+        
+        # Calculate metrics
+        difference = current_spending - previous_spending
+        percentage_change = 0.0
+        if previous_spending > 0:
+            percentage_change = (difference / previous_spending) * 100
+        
+        return {
+            "current_spending": round(current_spending, 2),
+            "previous_spending": round(previous_spending, 2),
+            "difference": round(difference, 2),
+            "percentage_change": round(percentage_change, 2),
+            "trend": "increased" if difference > 0 else "decreased" if difference < 0 else "unchanged"
+        }
+    
