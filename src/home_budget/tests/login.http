@@ -1,0 +1,45 @@
+###
+
+# Login with JSON body
+POST http://0.0.0.0:8000/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+###
+
+# Test invalid credentials
+POST http://0.0.0.0:8000/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "wrongpassword"
+}
+
+###
+
+# Test non-existent user
+POST http://0.0.0.0:8000/auth/login
+Content-Type: application/json
+
+{
+  "email": "nonexistent@example.com",
+  "password": "password123"
+}
+
+###
+
+# Test invalid email format
+POST http://0.0.0.0:8000/auth/login
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "password": "password123"
+}
+
+###

@@ -8,12 +8,14 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "bcrypt==4.3.0",
     "fastapi>=0.118.0",
     "httpx>=0.28.1",
     "passlib[bcrypt]>=1.7.4",
     "pydantic[email]>=2.11.9",
     "pytest>=8.4.2",
     "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.20",
     "sqlalchemy>=2.0.43",
     "uvicorn>=0.37.0",
 ]

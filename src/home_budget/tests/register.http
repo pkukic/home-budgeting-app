@@ -1,0 +1,98 @@
+###
+
+# Test registration
+POST http://0.0.0.0:8000/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+###
+
+# Test registration with different user
+POST http://0.0.0.0:8000/auth/register
+Content-Type: application/json
+
+{
+  "email": "user2@example.com",
+  "password": "differentpassword"
+}
+
+###
+
+# Test registration with invalid email
+POST http://0.0.0.0:8000/auth/register
+Content-Type: application/json
+
+{
+  "email": "not-a-valid-email",
+  "password": "password123"
+}
+
+###
+
+# Test registration with missing email
+POST http://0.0.0.0:8000/auth/register
+Content-Type: application/json
+
+{
+  "password": "password123"
+}
+
+###
+
+# Test registration with missing password
+POST http://0.0.0.0:8000/auth/register
+Content-Type: application/json
+
+{
+  "email": "user3@example.com"
+}
+
+###
+
+# Test registration with empty password (should fail)
+POST http://0.0.0.0:8000/auth/register
+Content-Type: application/json
+
+{
+  "email": "user4@example.com",
+  "password": ""
+}
+
+###
+
+# Test registration with whitespace-only password (should fail)
+POST http://0.0.0.0:8000/auth/register
+Content-Type: application/json
+
+{
+  "email": "user5@example.com",
+  "password": "   "
+}
+
+###
+
+# Test registration with short password (should fail)
+POST http://0.0.0.0:8000/auth/register
+Content-Type: application/json
+
+{
+  "email": "user6@example.com",
+  "password": "123"
+}
+
+###
+
+# Test registration with minimum valid password (should succeed)
+POST http://0.0.0.0:8000/auth/register
+Content-Type: application/json
+
+{
+  "email": "user7@example.com",
+  "password": "123456"
+}
+
+###

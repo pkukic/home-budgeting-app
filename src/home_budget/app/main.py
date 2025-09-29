@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from home_budget.app.database import engine, Base
-from home_budget.app.routers import categories
+from home_budget.app.routers import categories, auth
 from home_budget.app.init_categories import create_predefined_categories
 
 # Create database tables
@@ -17,6 +17,7 @@ app = FastAPI(
 
 # Include routers
 app.include_router(categories.router)
+app.include_router(auth.router)
 
 @app.get("/")
 def read_root():
