@@ -13,7 +13,7 @@ class UserCreate(UserBase):
 
     @field_validator('password')
     def validate_password(cls, v):
-        if not v or v.strip() == "":
+        if not v or len(v.strip()) == 0:
             raise ValueError('Password cannot be empty')
         if len(v) < 6:
             raise ValueError('Password must be at least 6 characters long')
@@ -34,8 +34,16 @@ class CategoryBase(BaseModel):
 
 
 class CategoryCreate(CategoryBase):
-    pass
-
+    name: str = Field(..., min_length=1, description="Category name is required and cannot be empty")
+    
+    @field_validator('name')
+    def validate_name(cls, v):
+        if not v:
+            raise ValueError('Category name cannot be empty')
+        stripped = v.strip()
+        if len(stripped) == 0:
+            raise ValueError('Category name cannot be only whitespace')
+        return stripped
 
 class CategoryResponse(CategoryBase):
     id: int
@@ -73,4 +81,10 @@ class Token(BaseModel):
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=1, description="Password is required")
+    
+    @field_validator('password')
+    def validate_password(cls, v):
+        if not v or len(v.strip()) == 0:
+            raise ValueError('Password cannot be empty')
+        return v

@@ -1,0 +1,258 @@
+# ===== CREATE TESTS =====
+
+###
+
+# Get all categories (initial state)
+GET http://0.0.0.0:8000/categories
+
+###
+
+# Create a new category
+POST http://0.0.0.0:8000/categories
+Content-Type: application/json
+
+{
+  "name": "Test Category"
+}
+
+###
+
+# Create another category
+POST http://0.0.0.0:8000/categories
+Content-Type: application/json
+
+{
+  "name": "Groceries"
+}
+
+###
+
+# Try to create duplicate category (should fail)
+POST http://0.0.0.0:8000/categories
+Content-Type: application/json
+
+{
+  "name": "Test Category"
+}
+
+###
+
+# Create category with empty name (should fail)
+POST http://0.0.0.0:8000/categories
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+###
+
+# Create category with only whitespace (should fail)
+POST http://0.0.0.0:8000/categories
+Content-Type: application/json
+
+{
+  "name": "   "
+}
+
+###
+
+# Create category without name field (should fail)
+POST http://0.0.0.0:8000/categories
+Content-Type: application/json
+
+{
+}
+
+###
+
+# Create category with very long name
+POST http://0.0.0.0:8000/categories
+Content-Type: application/json
+
+{
+  "name": "This is a very long category name that might test the system limits for category name length validation"
+}
+
+###
+
+# ===== READ TESTS =====
+
+# Get all categories after creating some
+GET http://0.0.0.0:8000/categories
+
+###
+
+# Get specific category by ID (replace with actual ID after creating categories)
+GET http://0.0.0.0:8000/categories/1
+
+###
+
+# Get category by ID 2
+GET http://0.0.0.0:8000/categories/2
+
+###
+
+# Get category by ID 10 (predefined category)
+GET http://0.0.0.0:8000/categories/10
+
+###
+
+# Try to get non-existent category (should return 404)
+GET http://0.0.0.0:8000/categories/999
+
+###
+
+# Try to get category with invalid ID format (should return 422)
+GET http://0.0.0.0:8000/categories/abc
+
+###
+
+# Try to get category with negative ID
+GET http://0.0.0.0:8000/categories/-1
+
+###
+
+# Try to get category with zero ID
+GET http://0.0.0.0:8000/categories/0
+
+###
+
+# ===== UPDATE TESTS =====
+
+# Update category with ID 1 (replace with actual ID)
+PUT http://0.0.0.0:8000/categories/1
+Content-Type: application/json
+
+{
+  "name": "Updated Category Name"
+}
+
+###
+
+# Update category with ID 2
+PUT http://0.0.0.0:8000/categories/2
+Content-Type: application/json
+
+{
+  "name": "Updated Groceries"
+}
+
+###
+
+# Try to update with duplicate name (should fail)
+PUT http://0.0.0.0:8000/categories/1
+Content-Type: application/json
+
+{
+  "name": "Updated Groceries"
+}
+
+###
+
+# Try to update non-existent category (should return 404)
+PUT http://0.0.0.0:8000/categories/999
+Content-Type: application/json
+
+{
+  "name": "Non-existent Category"
+}
+
+###
+
+# Try to update with empty name (should fail)
+PUT http://0.0.0.0:8000/categories/1
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+###
+
+# Try to update with only whitespace (should fail)
+PUT http://0.0.0.0:8000/categories/1
+Content-Type: application/json
+
+{
+  "name": "   "
+}
+
+###
+
+# Try to update without name field (should fail)
+PUT http://0.0.0.0:8000/categories/1
+Content-Type: application/json
+
+{
+}
+
+###
+
+# Update with special characters
+PUT http://0.0.0.0:8000/categories/1
+Content-Type: application/json
+
+{
+  "name": "Updated Food & Drinks"
+}
+
+###
+
+# Try to update with invalid ID format
+PUT http://0.0.0.0:8000/categories/abc
+Content-Type: application/json
+
+{
+  "name": "Invalid ID Test"
+}
+
+###
+
+# ===== DELETE TESTS =====
+
+# Delete category with ID 1 (replace with actual ID of a test category)
+DELETE http://0.0.0.0:8000/categories/1
+
+###
+
+# Delete category with ID 2
+DELETE http://0.0.0.0:8000/categories/2
+
+###
+
+# Try to delete non-existent category (should return 404)
+DELETE http://0.0.0.0:8000/categories/999
+
+###
+
+# Try to delete with invalid ID format (should return 422)
+DELETE http://0.0.0.0:8000/categories/abc
+
+###
+
+# Try to delete with negative ID
+DELETE http://0.0.0.0:8000/categories/-1
+
+###
+
+# Try to delete predefined category (should work but might affect other tests)
+# DELETE http://0.0.0.0:8000/categories/10
+
+###
+
+# Delete and then try to get the same category (should return 404)
+# First delete:
+DELETE http://0.0.0.0:8000/categories/3
+
+###
+
+# Then try to get it:
+GET http://0.0.0.0:8000/categories/3
+
+###
+
+# Try to delete already deleted category (should return 404)
+DELETE http://0.0.0.0:8000/categories/3
+
+###

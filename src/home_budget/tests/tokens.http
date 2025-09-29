@@ -1,0 +1,110 @@
+# ===== TOKEN GENERATION TESTS =====
+
+###
+
+# Test OAuth2 token endpoint (form data)
+POST http://0.0.0.0:8000/auth/token
+Content-Type: application/x-www-form-urlencoded
+
+username=user@example.com&password=password123
+###
+
+# Test invalid credentials with token endpoint
+POST http://0.0.0.0:8000/auth/token
+Content-Type: application/x-www-form-urlencoded
+
+username=user@example.com&password=wrongpassword
+
+###
+
+# Test missing username
+POST http://0.0.0.0:8000/auth/token
+Content-Type: application/x-www-form-urlencoded
+
+password=password123
+
+###
+
+# Test missing password
+POST http://0.0.0.0:8000/auth/token
+Content-Type: application/x-www-form-urlencoded
+
+username=user@example.com
+
+###
+
+# ===== TOKEN VALIDATION TESTS =====
+
+# First, get a valid token by logging in
+POST http://0.0.0.0:8000/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+###
+
+# Test token with different Bearer formats
+# Valid format
+GET http://0.0.0.0:8000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTUyNDEyfQ.g0QGAlRRurlTxRtvo72oFgGj081UteIKhJyQUlTd1tw
+
+###
+
+# Invalid format - missing Bearer
+GET http://0.0.0.0:8000/auth/me
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTUyNDEyfQ.g0QGAlRRurlTxRtvo72oFgGj081UteIKhJyQUlTd1tw
+
+###
+
+# Invalid format - wrong scheme
+GET http://0.0.0.0:8000/auth/me
+Authorization: Basic eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTUyNDEyfQ.g0QGAlRRurlTxRtvo72oFgGj081UteIKhJyQUlTd1tw
+
+###
+
+# Invalid format - extra spaces
+GET http://0.0.0.0:8000/auth/me
+Authorization: Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTUyNDEyfQ.g0QGAlRRurlTxRtvo72oFgGj081UteIKhJyQUlTd1tw
+
+###
+
+# Test with malformed JWT tokens
+# Missing parts (should have 3 parts separated by dots)
+GET http://0.0.0.0:8000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+
+###
+
+# Invalid signature
+GET http://0.0.0.0:8000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.invalid_signature
+
+###
+
+# Completely invalid token
+GET http://0.0.0.0:8000/auth/me
+Authorization: Bearer invalid_token_string
+
+###
+
+# Empty token
+GET http://0.0.0.0:8000/auth/me
+Authorization: Bearer
+
+###
+
+# Very long invalid token
+GET http://0.0.0.0:8000/auth/me
+Authorization: Bearer very_long_invalid_token_that_should_be_rejected_by_the_jwt_validation_system_and_return_proper_error_message
+
+###
+
+# Test token with valid format but expired timestamp (manually crafted)
+# This is a token with exp set to a past date
+GET http://0.0.0.0:8000/auth/me
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNjAwMDAwMDAwfQ.example_expired_token
+
+###
