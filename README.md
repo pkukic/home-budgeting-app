@@ -14,7 +14,7 @@ Features:
 - expenses CRUD (spending money = adding expenses)
 - every bill has a relation to a category
 - filter bills by parameters (category, price min/max, any other parameter)
-- data aggregation endpoint (example: money earned and spend in last month, quarter, year, ...)
+- data aggregation endpoint (example: money spent in last month, quarter, year, ...)
 
 Bonus:
 - there are predefined categories of your own choice (food, car, accomodation, gifts...)
