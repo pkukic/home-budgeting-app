@@ -174,31 +174,3 @@ def delete_expense(
     db.refresh(current_user)
     
     return {"message": "Expense deleted successfully", "refunded_amount": refund_amount}
-
-
-@router.get("/stats/summary")
-def get_expense_summary(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user_dependency)
-):
-    """Get expense summary for the authenticated user"""
-    
-    expenses = ExpenseCRUD.get_by_user(db, current_user.id)
-    
-    total_expenses = sum(exp.amount for exp in expenses)
-    expense_count = len(expenses)
-    
-    # Group by category
-    category_totals = {}
-    for expense in expenses:
-        category_name = expense.category.name
-        if category_name not in category_totals:
-            category_totals[category_name] = 0
-        category_totals[category_name] += expense.amount
-    
-    return {
-        "total_expenses": total_expenses,
-        "expense_count": expense_count,
-        "remaining_balance": current_user.balance,
-        "category_breakdown": category_totals
-    }

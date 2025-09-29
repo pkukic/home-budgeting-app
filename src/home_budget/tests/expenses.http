@@ -139,11 +139,6 @@ GET http://0.0.0.0:8000/expenses/1
 
 ###
 
-# Get expense summary/stats
-GET http://0.0.0.0:8000/expenses/stats/summary
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
-
-###
 
 # ===== UPDATE EXPENSE TESTS =====
 
