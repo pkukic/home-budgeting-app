@@ -1,0 +1,250 @@
+# ===== CREATE EXPENSE TESTS =====
+
+# Create a valid expense
+POST http://0.0.0.0:8000/expenses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": 50.0,
+  "description": "Grocery shopping",
+  "category_id": 12
+}
+
+###
+
+
+# Try to create expense with invalid category (should fail)
+POST http://0.0.0.0:8000/expenses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": 30.0,
+  "description": "Invalid category test",
+  "category_id": 999
+}
+
+###
+
+# Try to create expense with negative amount (should fail)
+POST http://0.0.0.0:8000/expenses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": -10.0,
+  "description": "Negative amount test",
+  "category_id": 1
+}
+
+###
+
+# Try to create expense with zero amount (should fail)
+POST http://0.0.0.0:8000/expenses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": 0.0,
+  "description": "Zero amount test",
+  "category_id": 1
+}
+
+###
+
+# Try to create expense without authentication (should fail)
+POST http://0.0.0.0:8000/expenses
+Content-Type: application/json
+
+{
+  "amount": 20.0,
+  "description": "No auth test",
+  "category_id": 1
+}
+
+###
+
+# Try to create expense that exceeds user balance (should fail)
+POST http://0.0.0.0:8000/expenses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": 2000.0,
+  "description": "Exceeds balance test",
+  "category_id": 5
+}
+
+###
+
+# Create expense without description (shouldn't work)
+POST http://0.0.0.0:8000/expenses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": 15.50,
+  "category_id": 3
+}
+
+###
+
+# ===== READ EXPENSE TESTS =====
+
+# Get all expenses for user
+GET http://0.0.0.0:8000/expenses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###
+
+# Get expenses with category filter
+GET http://0.0.0.0:8000/expenses?category_id=12
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###
+
+# Get expenses with amount range filter
+GET http://0.0.0.0:8000/expenses?min_amount=20&max_amount=60
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###
+
+# Get expenses with minimum amount filter
+GET http://0.0.0.0:8000/expenses?min_amount=60
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###
+
+# Get expenses with maximum amount filter
+GET http://0.0.0.0:8000/expenses?max_amount=30
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###
+
+# Get specific expense by ID (replace 1 with actual expense ID)
+GET http://0.0.0.0:8000/expenses/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###
+
+# Try to get non-existent expense (should return 404)
+GET http://0.0.0.0:8000/expenses/999
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###
+
+# Try to get expense without authentication (should fail)
+GET http://0.0.0.0:8000/expenses/1
+
+###
+
+# Get expense summary/stats
+GET http://0.0.0.0:8000/expenses/stats/summary
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###
+
+# ===== UPDATE EXPENSE TESTS =====
+
+# Update an expense (replace 1 with actual expense ID)
+PUT http://0.0.0.0:8000/expenses/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": 55.0,
+  "description": "Updated grocery shopping",
+  "category_id": 5
+}
+
+###
+
+# Try to update expense to invalid category (should fail)
+PUT http://0.0.0.0:8000/expenses/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": 45.0,
+  "description": "Invalid category update",
+  "category_id": 999
+}
+
+###
+
+# Try to update expense with negative amount (should fail)
+PUT http://0.0.0.0:8000/expenses/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": -5.0,
+  "description": "Negative amount update",
+  "category_id": 10
+}
+
+###
+
+# Try to update non-existent expense (should return 404)
+PUT http://0.0.0.0:8000/expenses/999
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": 30.0,
+  "description": "Non-existent expense update",
+  "category_id": 1
+}
+
+###
+
+# Try to update expense without authentication (should fail)
+PUT http://0.0.0.0:8000/expenses/1
+Content-Type: application/json
+
+{
+  "amount": 40.0,
+  "description": "No auth update",
+  "category_id": 10
+}
+
+###
+
+# Update expense that would exceed balance (should fail)
+PUT http://0.0.0.0:8000/expenses/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+{
+  "amount": 1500.0,
+  "description": "Exceeds balance update",
+  "category_id": 10
+}
+
+###
+
+# ===== DELETE EXPENSE TESTS =====
+
+# Delete an expense (replace 2 with actual expense ID)
+DELETE http://0.0.0.0:8000/expenses/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###
+
+# Try to delete non-existent expense (should return 404)
+DELETE http://0.0.0.0:8000/expenses/999
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###
+
+# Try to delete expense without authentication (should fail)
+DELETE http://0.0.0.0:8000/expenses/1
+
+###
+
+# Check balance after deletion
+GET http://0.0.0.0:8000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNzU5MTU1MDkxfQ.apF2ZI445PK0T8dqjMtdffQKP_zLm_zKk4clgioUL-o
+
+###

@@ -55,13 +55,32 @@ class CategoryResponse(CategoryBase):
 # Expense schemas
 class ExpenseBase(BaseModel):
     amount: float
-    description: Optional[str] = None
+    description: str
     category_id: int
 
 
 class ExpenseCreate(ExpenseBase):
-    pass
+    amount: float = Field(..., gt=0, description="Expense amount must be positive")
+    description: str = Field(..., description="Description of the expense")
+    category_id: int = Field(..., gt=0, description="Category ID must be positive")
 
+    @field_validator('amount')
+    def validate_amount(cls, v):
+        if v <= 0:
+            raise ValueError('Expense amount must be positive')
+        return v
+    
+    @field_validator('description')
+    def validate_description(cls, v):
+        if not v or len(v.strip()) == 0:
+            raise ValueError('Description cannot be empty')
+        return v.strip()
+    
+    @field_validator('category_id')
+    def validate_category_id(cls, v):   
+        if v <= 0:
+            raise ValueError('Category ID must be positive')
+        return v
 
 class ExpenseResponse(ExpenseBase):
     id: int

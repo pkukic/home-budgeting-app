@@ -103,3 +103,13 @@ class ExpenseCRUD:
         db.commit()
         db.refresh(db_expense)
         return db_expense
+    
+    @staticmethod
+    def delete(db: Session, expense_id: int) -> bool:
+        """Delete an expense"""
+        db_expense = ExpenseCRUD.get_by_id(db, expense_id)
+        if db_expense:
+            db.delete(db_expense)
+            db.commit()
+            return True
+        return False
