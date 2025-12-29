@@ -11,12 +11,14 @@ A simple REST API for personal expense tracking and budget management built with
 - **Analytics & reporting** - Get spending insights by time periods and categories
 - **Balance management** - Track remaining balance (**starts with $1000.00**)
 
+## Prerequisites
+
+- Python 3.11+
+- uv package manager (recommended) or pip
+
 ## Installation
 
 This project uses [uv](https://github.com/astral-sh/uv) for Python package management.
-
-### Prerequisites
-- uv package manager
 
 ### Install uv (if not already installed)
 ```bash
