@@ -29,19 +29,14 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-### Setup project
+### Run the install script
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd home-budget
 
-# Install dependencies
-uv sync
-
-# Activate virtual environment
-source .venv/bin/activate  # On Linux/macOS
-# or
-.venv\Scripts\activate     # On Windows
+# Run the install script
+./install.sh
 ```
 
 ## Usage
